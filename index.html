@@ -104,7 +104,7 @@
         if (!res.ok) throw new Error("Chyba při načítání");
 
         const data = await res.json();
-        const items = data.record;
+        const items = Array.isArray(data.record) ? data.record : [];
         const container = document.getElementById("wishlist");
 
         container.innerHTML = items.map((item, index) => `
@@ -122,10 +122,10 @@
           </div>
         `).join('');
 
-        window.wishlistData = data; // Uložíme si data pro pozdější PUT
+        window.wishlistData = data; // Uložíme si poslední načtená data
       } catch (err) {
         document.getElementById("wishlist").innerHTML = "<p class='error'>Chyba při načítání dat.</p>";
-        console.error(err);
+        console.error("Wishlist load error:", err);
       }
     }
 
@@ -135,11 +135,18 @@
       const name = form.name.value.trim();
       if (!name) return;
 
-      // aktualizuj lokální data
-      const updated = { ...window.wishlistData };
+      if (!window.wishlistData || !Array.isArray(window.wishlistData.record)) {
+        alert("Nelze uložit – interní chyba.");
+        return;
+      }
+
+      const updated = {
+        ...window.wishlistData,
+        record: [...window.wishlistData.record]
+      };
+
       updated.record[index].reservedBy = name;
 
-      // pošli PUT
       try {
         const res = await fetch(API_URL, {
           method: "PUT",
@@ -152,7 +159,7 @@
         loadWishlist(); // reload
       } catch (err) {
         alert("Nepodařilo se uložit. Zkus to znovu.");
-        console.error(err);
+        console.error("PUT error:", err);
       }
     }
 
