@@ -122,7 +122,7 @@
           </div>
         `).join('');
 
-        window.wishlistData = data; // Uložíme si poslední načtená data
+        window.wishlistData = data;
       } catch (err) {
         document.getElementById("wishlist").innerHTML = "<p class='error'>Chyba při načítání dat.</p>";
         console.error("Wishlist load error:", err);
@@ -156,7 +156,7 @@
 
         if (!res.ok) throw new Error("Chyba při ukládání");
 
-        loadWishlist(); // reload
+        loadWishlist(); // znovunačtení
       } catch (err) {
         alert("Nepodařilo se uložit. Zkus to znovu.");
         console.error("PUT error:", err);
